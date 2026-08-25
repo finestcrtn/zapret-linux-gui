@@ -1,0 +1,80 @@
+app-id: io.github.zapretgui.ZapretGui
+branch: stable
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: zapret-gui
+
+finish-args:
+  # GUI (Tk is X11-only, so expose the X11 socket; XWayland covers Wayland)
+  - --socket=x11
+  - --share=ipc
+  # downloads from GitHub at first run / update time
+  - --share=network
+  # unlocks flatpak-spawn --host (host control: systemctl + pkexec)
+  - --talk-name=org.freedesktop.Flatpak
+
+modules:
+  - name: tcl
+    buildsystem: simple
+    build-commands:
+      - cd unix && ./configure --prefix=/app --exec-prefix=/app --libdir=/app/lib --includedir=/app/include
+      - cd unix && make -j${FLATPAK_BUILDER_N_JOBS}
+      - cd unix && make install
+      - rm -rf /app/lib/tcl8.6/demos /app/share/man
+      - chmod -R u+w /app/lib /app/bin /app/include || true
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/tcl/tcl8.6.13-src.tar.gz
+        sha256: 43a1fae7412f61ff11de2cfd05d28cfc3a73762f354a417c62370a54e2caf066
+
+  - name: tk
+    buildsystem: simple
+    build-commands:
+      - cd unix && ./configure --prefix=/app --exec-prefix=/app --libdir=/app/lib --includedir=/app/include --with-tcl=/app/lib
+      - cd unix && make -j${FLATPAK_BUILDER_N_JOBS}
+      - cd unix && make install
+      - rm -rf /app/lib/tk8.6/demos /app/share/man
+      - chmod -R u+w /app/lib /app/bin /app/include || true
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/tcl/tk8.6.13-src.tar.gz
+        sha256: 2e65fa069a23365440a3c56c556b8673b5e32a283800d8d9b257e3f584ce0675
+
+  - name: python
+    buildsystem: simple
+    build-commands:
+      - "./configure --prefix=/app --with-tcltk-includes=-I/app/include '--with-tcltk-libs=-L/app/lib -ltk8.6 -ltcl8.6'"
+      - make -j${FLATPAK_BUILDER_N_JOBS}
+      - make install
+      - chmod -R u+w /app/lib /app/bin /app/include || true
+      # make sure tkinter (the whole point of bundling python/tcl/tk) is present
+      - /app/bin/python3 -c "import tkinter; assert tkinter.TkVersion >= 8; print('tkinter OK')"
+      - rm -rf /app/lib/python3.13/test /app/lib/python3.13/idle_test || true
+    sources:
+      - type: archive
+        url: https://www.python.org/ftp/python/3.13.6/Python-3.13.6.tgz
+        sha256: 6cf50672cc03928488817d45af24bc927a48f910fe7893d6f388130e59ba98d7
+
+  - name: zapretgui-app
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 launcher.sh /app/bin/zapret-gui
+      - install -Dm755 zapret_gui.py /app/lib/zapretgui/zapret_gui.py
+      - install -Dm755 zapretctl.py /app/lib/zapretgui/zapretctl.py
+      - install -Dm644 io.github.zapretgui.ZapretGui.desktop /app/export/share/applications/io.github.zapretgui.ZapretGui.desktop
+      - install -Dm644 io.github.zapretgui.ZapretGui.svg /app/export/share/icons/hicolor/scalable/apps/io.github.zapretgui.ZapretGui.svg
+      - install -Dm644 io.github.zapretgui.ZapretGui.metainfo.xml /app/export/share/metainfo/io.github.zapretgui.ZapretGui.metainfo.xml
+    sources:
+      - type: file
+        path: files/launcher.sh
+      - type: file
+        path: ../src/zapret_gui.py
+      - type: file
+        path: ../src/zapretctl.py
+      - type: file
+        path: files/io.github.zapretgui.ZapretGui.desktop
+      - type: file
+        path: files/io.github.zapretgui.ZapretGui.svg
+      - type: file
+        path: files/io.github.zapretgui.ZapretGui.metainfo.xml

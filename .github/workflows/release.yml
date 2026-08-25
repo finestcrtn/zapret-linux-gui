@@ -1,0 +1,77 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install flatpak tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq flatpak flatpak-builder gnupg
+
+      - name: Add flathub (platform/sdk/builder)
+        run: |
+          flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08
+          flatpak install --user -y flathub org.flatpak.Builder
+
+      - name: Set release version from tag
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ "$VERSION" == "${GITHUB_REF_NAME}" ]]; then VERSION="dev"; fi
+          sed -i "s/^APP_VERSION = .*/APP_VERSION = \"${VERSION}\"/" src/zapretctl.py
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build flatpak
+        run: |
+          flatpak run --command=flatpak-builder org.flatpak.Builder \
+            --user --disable-rofiles-fuse --force-clean \
+            --repo=pages-repo build flatpak/io.github.zapretgui.ZapretGui.yaml
+
+      - name: Import signing key
+        env:
+          GPG_KEY: ${{ secrets.FLATPAK_GPG_KEY }}
+        run: |
+          if [ -z "$GPG_KEY" ]; then
+            echo "::error::FLATPAK_GPG_KEY secret is not set" && exit 1
+          fi
+          mkdir -m 700 "$HOME/.gnupg"
+          echo "$GPG_KEY" | gpg --batch --import
+          KEYID="$(gpg --batch --list-secret-keys --with-colons | awk -F: '/^sec:/{print $5; exit}')"
+          echo "keyid=$KEYID" >> "$GITHUB_OUTPUT"
+
+      - name: Sign repo + generate flatpakrepo / flatpakref + bundle
+        run: bash ci/release.sh "${{ steps.import.outputs.keyid }}" "${{ steps.version.outputs.version }}" pages-repo build site pages-out
+
+      - name: Attach bundle to Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            zapret-gui.flatpak
+            install.sh
+          generate_release_notes: true
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages-out
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Zapret Control
+Comment=Zapret DPI bypass manager (flatpak edition)
+Exec=zapret-gui
+Icon=io.github.zapretgui.ZapretGui
+Terminal=false
+Type=Application
+Categories=Network;Utility;
+StartupNotify=false

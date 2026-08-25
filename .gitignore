@@ -1,0 +1,17 @@
+# build artifacts
+build/
+repo/
+pages-repo/
+pages-out/
+.flatpak-builder/
+target/
+
+# python
+__pycache__/
+*.pyc
+
+# generated single-file bundle (built by CI / build.sh)
+zapret-gui.flatpak
+
+# local test leftovers
+*.log

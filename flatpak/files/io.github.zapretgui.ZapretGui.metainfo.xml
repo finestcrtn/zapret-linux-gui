@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.zapretgui.ZapretGui</id>
+  <name>Zapret Control</name>
+  <summary>Zapret DPI bypass manager</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>
+      A self-contained Flatpak manager for the zapret DPI bypass stack.
+      On first launch it downloads all components (nfqws, strategies)
+      directly from GitHub and installs an isolated root daemon. It never
+      touches an existing system zapret installation.
+    </p>
+    <p>
+      Requires a one-time administrator authorization when installing the
+      service. After that the daemon is controlled silently and can be
+      set to start at boot.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.zapretgui.ZapretGui.desktop</launchable>
+  <categories>
+    <category>Network</category>
+    <category>Utility</category>
+  </categories>
+  <releases>
+    <release version="0.1.0" date="2026-08-26"/>
+  </releases>
+</component>
