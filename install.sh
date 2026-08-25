@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
-# Install the Zapret Linux GUI flatpak from a downloaded release asset.
+# Установка Zapret Linux GUI.
 set -e
 
 if ! command -v flatpak >/dev/null 2>&1; then
-    echo "flatpak is required but not installed." >&2
-    echo "Install it first with your system package manager, then run this script again." >&2
+    echo "Не найден flatpak. Сначала установи его (см. документацию своего дистрибутива)." >&2
     exit 1
+fi
+
+if [ ! -f ./zapret-gui.flatpak ]; then
+    echo "Файл zapret-gui.flatpak не найден — собираю из исходников..."
+    ./build.sh
 fi
 
 flatpak install --user -y ./zapret-gui.flatpak
 
 echo
-echo "Installed. Launch 'Zapret Control' from your app menu, or run:"
+echo "Готово. Запусти 'Zapret Control' из меню приложений:"
 echo "  flatpak run io.github.zapretgui.ZapretGui"
 echo
-echo "On first launch the app downloads zapret and shows one admin prompt — that is expected."
+echo "Первый запуск скачает zapret и один раз спросит пароль — это нормально."
