@@ -14,7 +14,7 @@ OUT="$6"
 
 OWNER="${GITHUB_REPOSITORY_OWNER:-finestcrtn}"
 PROJECT="zapret-linux-gui"
-COLLECTION_ID="io.github.zapret-linux-gui.zapretgui"
+COLLECTION_ID="io.github.zapretlinuxgui.zapretgui"
 APP_ID="io.github.zapretgui.ZapretGui"
 BASE_URL="https://${OWNER}.github.io/${PROJECT}"
 
