@@ -43,6 +43,7 @@ jobs:
             --repo=pages-repo build flatpak/io.github.zapretgui.ZapretGui.yaml
 
       - name: Import signing key
+        id: import
         env:
           GPG_KEY: ${{ secrets.FLATPAK_GPG_KEY }}
         run: |
