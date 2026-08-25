@@ -3,7 +3,7 @@
 set -e
 
 if ! command -v flatpak >/dev/null 2>&1; then
-    echo "Не найден flatpak. Сначала установи его (см. документацию своего дистрибутива)." >&2
+    echo "Не найден flatpak. Сначала установите его (см. документацию своего дистрибутива)." >&2
     exit 1
 fi
 
@@ -15,7 +15,7 @@ fi
 flatpak install --user -y ./zapret-gui.flatpak
 
 echo
-echo "Готово. Запусти 'Zapret Control' из меню приложений:"
+echo "Готово. Запустите 'Zapret Control' из меню приложений:"
 echo "  flatpak run io.github.zapretgui.ZapretGui"
 echo
-echo "Первый запуск скачает zapret и один раз спросит пароль — это нормально."
+echo "Первый запуск скачает zapret и один раз запросит пароль — это нормально."
