@@ -6,17 +6,23 @@
 
 ## Установка
 
-**Вариант 1 — из Release:**
+**Вариант 1 — из Release (рекомендуется):**
 
 1. Откройте [Releases](https://github.com/finestcrtn/zapret-linux-gui/releases)
-2. Скачайте **`zapret-gui.flatpak`**
-3. Установите: дважды щёлкните по скачанному файлу, или выполните:
+2. Скачайте **`zapret-gui.flatpak`** — файл сохранится в папку «Загрузки»
+3. Установите:
 
    ```sh
-   flatpak install --user ./zapret-gui.flatpak
+   flatpak install --user ~/Downloads/zapret-gui.flatpak
    ```
 
-4. Запустите **Zapret Control** из меню приложений.
+4. Запустите **Zapret Control** из меню приложений или командой:
+
+   ```sh
+   flatpak run io.github.zapretgui.ZapretGui
+   ```
+
+> Двойной щелчок по скачанному файлу тоже установит приложение, но только если на системе есть магазин приложений (KDE Discover или GNOME Software). Если двойной щелчок ничего не сделал — просто выполните команду выше.
 
 **Вариант 2 — из исходников:**
 
